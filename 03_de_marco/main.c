@@ -4,8 +4,9 @@
 #include <fcntl.h>
 #include <string.h>
 
-//nota: ESSE TIPO DE IF É O ERRADO!!!!! aparentemente.
-//TROCAR DEPOIS!
+//nota atualisada: esse é o if certo, não precisa atualizar.
+//Verificação de SO é feita em tempo de compilação, não em runtime.
+//Esse #if é feito em tempo de compilação.
 
 //Adiciona bibliotecas de windows apenas no SO certo
 #if defined(_WIN32) || defined (_WIN64)
