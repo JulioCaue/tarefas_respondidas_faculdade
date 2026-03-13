@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <fcntl.h>
+#include <string.h>
 
 #if defined(_WIN32) || defined (_WIN64)
     #include <windows.h>
     #include <io.h>
+    #include <wchar.h>
 #endif
 
 
@@ -18,7 +20,7 @@ void limpar_tela(void){
         system("clear");
     #endif
 }
-
+#if defined(_WIN32) || defined (_WIN64)
 //logica para windows (com variaveis wide)
 //só tristeza aqui como um todo, sinceramente
 void logica_windows(void){
@@ -57,6 +59,7 @@ void logica_windows(void){
     getchar();
     getchar();
 }
+#endif
 
 void logica_linux(void){
     setlocale(LC_ALL, "pt_BR.UTF-8");
@@ -77,18 +80,19 @@ void logica_linux(void){
 
     limpar_tela();
 
-    printf("\nSeu nome: %sSua idade: %dSua altura: %.2f",nome,idade,altura);
+    printf("\nSeu nome é: %s\nSua idade é: %d\nSua altura é: %.2f",nome,idade,altura);
 
     getchar();
     getchar();
 }
 
-void main(){
+int main(void){
     #if defined(_WIN32) || defined (_WIN64)
         logica_windows();
     #else
         logica_linux();
     #endif
+    return 0;
 }
 
 
