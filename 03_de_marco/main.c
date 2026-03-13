@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <string.h>
 
+//Adiciona bibliotecas de windows apenas no SO certo
 #if defined(_WIN32) || defined (_WIN64)
     #include <windows.h>
     #include <io.h>
@@ -20,21 +21,25 @@ void limpar_tela(void){
         system("clear");
     #endif
 }
+
+//compila bloco apenas em windows
 #if defined(_WIN32) || defined (_WIN64)
 //logica para windows (com variaveis wide)
-//só tristeza aqui como um todo, sinceramente
 void logica_windows(void){
-    system("chcp 65001 > nul"); //acho que isso troca o encoding do terminal (???)
+    //Faz terminal rodar em UTF-8
+    system("chcp 65001 > nul"); //"chcp 65001" troca terminal para UTF-8. "> nul" remove mensagem "Active code page: 65001"
     setlocale(LC_ALL, "pt_BR.UTF-8");
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
-    //aqui w = wide = dois bytes ao envés de um (aparentemente)
+    //aqui w = wide = dois bytes ao envés de um por caractere (aparentemente) em UTF-16
+    // caracteres como "ê" são dois bytes pelo que parece, portanto faço assim
+    // tá funcionando pelo menos
     wchar_t nome[50]; 
     int idade;
     float altura;
 
-    //transforma em wide (eu acho???)
+    //transforma stdin em wide (tratar entrada como wide chars)
     _setmode(_fileno(stdin), _O_WTEXT);
 
     //teste
@@ -42,9 +47,10 @@ void logica_windows(void){
 
     printf("Digite seu nome: ");
     fgetws(nome,sizeof(nome),stdin);
+    //remove o "\n" no final da string e troca ele por "/0" (terminador nulo/fim da string)
     nome[wcscspn(nome,L"\n")]=L'\0';
 
-    //não sei oq esse L faz mas ele tá ai
+    //O "L" transforma as literal strings em wide literal strings 
     printf("Digite sua idade: ");
     wscanf(L"%d",&idade);
 
@@ -53,20 +59,25 @@ void logica_windows(void){
 
     limpar_tela();
 
+    //"%.2f" é formatação para apenas duas casas decimais.
     wprintf(L"\nSeu nome é: %ls\nSua idade é: %d\nSua altura é:%.2f",nome,idade,altura);
 
-    //aparentemente não funciona, mas tá aqui pra deixar janela aberta
+    //mantém programa aberto
     getchar();
     getchar();
 }
 #endif
 
+//logica para linux, com chars normais
 void logica_linux(void){
     setlocale(LC_ALL, "pt_BR.UTF-8");
 
     char nome[50];
     int idade;
     float altura;
+
+    //teste
+    printf("á é í ó ú ç Á É Í Ó Ú Ç e ê Ê\n");
 
     printf("Digite seu nome: ");
     fgets(nome,sizeof(nome),stdin);
@@ -80,8 +91,10 @@ void logica_linux(void){
 
     limpar_tela();
 
+    //"%.2f" é formatação para apenas duas casas decimais.
     printf("\nSeu nome é: %s\nSua idade é: %d\nSua altura é: %.2f",nome,idade,altura);
 
+    //mantém programa aberto
     getchar();
     getchar();
 }
@@ -94,7 +107,3 @@ int main(void){
     #endif
     return 0;
 }
-
-
-
-//Tarefa: "informar nome, idade e altura. Depois informar esses dados pro usuário" 
